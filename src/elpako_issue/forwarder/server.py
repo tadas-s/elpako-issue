@@ -19,6 +19,9 @@ cors = CORS(
 
 @app.route("/welcome/", methods=["GET"])
 def welcome():
+    with visitor_data_lock:
+        visitor_data.clear()
+
     return render_template("welcome.html")
 
 @app.route("/welcome/wait_for_the_visitor", methods=["GET"])
