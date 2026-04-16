@@ -38,9 +38,12 @@ def wait_for_the_visitor():
         if time.time() - started > 300:
             return jsonify({ "success": False, "message": "Timed out"})
 
-    return jsonify({
-        "success": True
-    })
+    response = None
+
+    with visitor_data_lock:
+        response = { "success": True } | visitor_data
+
+    return jsonify(response)
 
 @app.route("/welcome/submit_visitor_name", methods=["POST"])
 def submit_visitor_name():
