@@ -121,3 +121,15 @@ def sign_dtbs():
             return jsonify({ "success": False, "message": "Timed out"})
 
     return jsonify(result)
+
+@app.route("/welcome/submit_result", methods=["post"])
+def submit_result():
+    global visitor_data
+
+    request_params = request.get_json()
+    print(f"Got the signature: {request_params['result']}")
+
+    with visitor_data_lock:
+        visitor_data['result'] = request_params['result']
+
+    return jsonify({})

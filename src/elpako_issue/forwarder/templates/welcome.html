@@ -52,6 +52,12 @@
           }).then(response => response.json());
 
         console.debug(signature);
+
+        await fetch('submit_result', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(signature)
+        });
       }
     </script>
   </head>
