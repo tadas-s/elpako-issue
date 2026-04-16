@@ -29,10 +29,29 @@
           body: JSON.stringify(certificate)
         });
 
-        // Fetch dtbs
         const dtbs = await fetch('dtbs').then(response => response.json());
 
-        console.debug(dtbs);
+        console.debug(dtbs)
+
+        signatureRequest = {
+          childName: visitorName,
+          store: "usb2",
+          certificate: certificate.certificate,
+          algorithm: "sha256",
+          sessionId: null,
+          dtbs: dtbs.dtbs,
+        }
+
+        console.debug(signatureRequest);
+
+        const signature =
+          await fetch("https://127.0.0.1:38888/Signing/Sign", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(signatureRequest)
+          }).then(response => response.json());
+
+        console.debug(signature);
       }
     </script>
   </head>
