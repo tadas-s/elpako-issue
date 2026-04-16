@@ -74,3 +74,50 @@ def submit_certificate():
     return jsonify({
         "success": True
     })
+
+@app.route("/welcome/dtbs", methods=["get"])
+def dtbs():
+    global visitor_data
+
+    started = time.time()
+
+    result = {}
+
+    while True:
+        with visitor_data_lock:
+            if 'dtbs' in visitor_data:
+                result['dtbs'] = visitor_data['dtbs']
+                break
+
+        time.sleep(0.1)
+
+        if time.time() - started > 300:
+            return jsonify({ "success": False, "message": "Timed out"})
+
+    return jsonify(result)
+
+@app.route("/welcome/sign_dtbs", methods=["post"])
+def sign_dtbs():
+    global visitor_data
+
+    result = {}
+    started = time.time()
+
+    request_params = request.get_json()
+    print(f"Got dtbs to sign: {request_params['dtbs']}")
+
+    with visitor_data_lock:
+        visitor_data['dtbs'] = request_params['dtbs']
+
+    while True:
+        with visitor_data_lock:
+            if 'result' in visitor_data:
+                result['result'] = visitor_data['result']
+                break
+
+        time.sleep(0.1)
+
+        if time.time() - started > 300:
+            return jsonify({ "success": False, "message": "Timed out"})
+
+    return jsonify(result)
