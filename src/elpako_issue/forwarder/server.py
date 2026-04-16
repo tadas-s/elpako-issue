@@ -1,9 +1,11 @@
+import os, time
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
 cors = CORS(
     app,
     resources={
@@ -14,3 +16,12 @@ cors = CORS(
 @app.route("/welcome/", methods=["GET"])
 def welcome():
     return "<h1>Sveiki!</h1>"
+
+@app.route("/welcome/wait_for_the_visitor", methods=["GET"])
+def wait_for_the_visitor():
+    # Dummy sleep for testing - should return as soon as visitor clicks "Sign in"
+    time.sleep(3)
+
+    return jsonify({
+        "success": True
+    })
