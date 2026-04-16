@@ -7,5 +7,7 @@ def run():
         hostname='127.0.0.1',
         port=4000,
         application=app,
-        threaded=True
+        threaded=True,
+        use_debugger=True,
+        use_reloader=True,
     )

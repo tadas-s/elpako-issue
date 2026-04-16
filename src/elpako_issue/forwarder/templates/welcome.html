@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="lt">
+  <head>
+    <title>Sveiki!</title>
+    <!--<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">-->
+    <script>
+      async function signIn() {
+        let errorBox = document.getElementById("error-box");
+
+        const visitorName =
+          await fetch('https://127.0.0.1:38888/Handshake/Browser')
+                  .then(response => response.text())
+                  .catch(error => { errorBox.innerText = "Trūksta Elpako programos.."; });
+
+        // FIXME: err handling?
+        await fetch('submit_visitor_name', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visitor_name: visitorName })
+        });
+
+        const certificate =
+          await fetch(`https://127.0.0.1:38888/Signing/SelectCertificate?childName=${visitorName}&store=usb2&purpose=authentication`)
+                  .then(response => response.json());
+
+        await fetch('submit_certificate', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(certificate)
+        });
+
+        // Fetch dbts
+        const dbts = await fetch('dbts').then(response => response.json());
+
+        console.debug(dbts);
+      }
+    </script>
+  </head>
+  <body>
+    <section class="content">
+      <header>Sveiki!</header>
+      <p id="error-box"></p>
+      <p>
+        <button onclick="signIn()">Prisijunkite</button> su Elpako ir asmens
+        tapatybės kortele.
+      </p>
+    </section>
+  </body>
+</html>

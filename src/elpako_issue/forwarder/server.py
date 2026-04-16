@@ -1,26 +1,69 @@
-import os, time
-from flask import Flask, request, jsonify
+import os, time, threading
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+visitor_data_lock = threading.Lock()
+visitor_data = {}
 
 cors = CORS(
     app,
     resources={
-        r"/*": {"origins": ["https://www.yoyo.lt"]}
+        r"/*": {"origins": ["https://www.yoyo.lt", "https://127.0.0.1"]}
     }
 )
 
 @app.route("/welcome/", methods=["GET"])
 def welcome():
-    return "<h1>Sveiki!</h1>"
+    return render_template("welcome.html")
 
 @app.route("/welcome/wait_for_the_visitor", methods=["GET"])
 def wait_for_the_visitor():
-    # Dummy sleep for testing - should return as soon as visitor clicks "Sign in"
-    time.sleep(3)
+    started = time.time()
+
+    while True:
+        with visitor_data_lock:
+            if set(visitor_data.keys()) == {'visitor_name', 'certificate', 'name', 'issuer', 'validTo'}:
+                break
+
+        time.sleep(0.1)
+
+        if time.time() - started > 300:
+            return jsonify({ "success": False, "message": "Timed out"})
+
+    return jsonify({
+        "success": True
+    })
+
+@app.route("/welcome/submit_visitor_name", methods=["POST"])
+def submit_visitor_name():
+    request_params = request.get_json()
+
+    print(f"Got visitor name: {request_params['visitor_name']}")
+
+    with visitor_data_lock:
+        visitor_data.clear()
+        visitor_data['visitor_name'] = request_params['visitor_name']
+
+    return jsonify({
+        "success": True
+    })
+
+@app.route("/welcome/submit_certificate", methods=["POST"])
+def submit_certificate():
+    request_params = request.get_json()
+
+    print(f"Got certificate: {request_params['name']} / {request_params['issuer']} / {request_params['validTo']}")
+
+    with visitor_data_lock:
+        visitor_data['certificate'] = request_params['certificate']
+        visitor_data['name'] = request_params['name']
+        visitor_data['issuer'] = request_params['issuer']
+        visitor_data['validTo'] = request_params['validTo']
 
     return jsonify({
         "success": True
