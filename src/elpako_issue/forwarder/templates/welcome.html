@@ -2,17 +2,23 @@
 <html lang="lt">
   <head>
     <title>Sveiki!</title>
-    <!--<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
-      async function signIn() {
+      async function signIn(button) {
         let errorBox = document.getElementById("error-box");
+        errorBox.hidden = true;
+
+        button.disabled = true;
 
         await fetch('start_session');
 
         const visitorName =
           await fetch('https://127.0.0.1:38888/Handshake/Browser')
                   .then(response => response.text())
-                  .catch(error => { errorBox.innerText = "Trūksta Elpako programos.."; });
+                  .catch(error => {
+                    errorBox.innerText = "Trūksta Elpako programos..";
+                    errorBox.hidden = false;
+                  });
 
         // FIXME: err handling?
         await fetch('submit_visitor_name', {
@@ -65,11 +71,33 @@
   </head>
   <body>
     <section class="content">
-      <header>Sveiki!</header>
-      <p id="error-box"></p>
+      <h1>Kas tai?</h1>
       <p>
-        <button onclick="signIn()">Prisijunkite</button> su Elpako ir asmens
-        tapatybės kortele.
+        Demonstracinis puslapis su prisijungimu naudojant:
+      </p>
+      <ul>
+        <li>Lietuvos asmens tapatybės kortelę</li>
+        <li>USB skaitytuvą</li>
+        <li><a href="https://www.nsc.vrm.lt/downloads.htm">Oficialią kortelės
+        programinę įrangą</a></li>
+        <li>Papildomą Elpako programinę įrangą reikalingą prisijungimui prie
+        <a href="https://www.epaslaugos.lt/">https://www.epaslaugos.lt/</a></li>
+      </ul>
+      <p>
+        Prisijungimo metu <a href="https://documenter.getpostman.com/view/11918038/UVJihuNs#9aa7e102-186c-4ed1-a8e7-7c3ff2be4924">Elpako Local API</a>
+        šaukiniai yra persiunčiami į kitą kompiuterį, kuriame taip vadinamas "dbts" ("data to be signed") žetonas (token)
+        ir jo parašas yra panaudojami prisijungti prie <a href="https://www.epaslaugos.lt/">https://www.epaslaugos.lt/</a>.
+      </p>
+      <p>
+        Vartotojas prisijungimo metu nėra tinkamai informuojamas apie pasirašomo žetono paskirtį ir neturi galimybės
+        suprasti, kad ištiesų jie leidžia šios svetainės autoriui prisijungti prie epaslaugos.lt portalo.
+      </p>
+      <p id="error-box" hidden="hidden"></p>
+      <p>
+        <button onclick="signIn(this)">Pradėti Prisijungimą*</button>
+      </p>
+      <p>
+        * - nebandykite patys, skirta tik gyvai demonstracijai.
       </p>
     </section>
   </body>

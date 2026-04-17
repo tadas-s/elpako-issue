@@ -3,7 +3,8 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="/welcome/static")
+
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
@@ -19,6 +20,9 @@ cors = CORS(
 
 @app.route("/welcome/", methods=["GET"])
 def welcome():
+    with visitor_data_lock:
+        visitor_data.clear()
+
     return render_template("welcome.html")
 
 @app.route("/welcome/start_session", methods=["GET"])
