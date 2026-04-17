@@ -1,6 +1,8 @@
 import json
 import os, pathlib
-from flask import Flask, request, jsonify
+
+import flask
+from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from base64 import b64encode, b64decode
 from hashlib import sha256
@@ -42,7 +44,10 @@ def wait_for_the_visitor():
 def handshake_browser():
     global visitor_data
 
-    return visitor_data['visitor_name']
+    if 'visitor_name' in visitor_data:
+        return visitor_data['visitor_name']
+    else:
+        abort(404)
 
 # GET /Signing/SelectCertificate?childName=jonas&sessionId=null&store=usb2&purpose=authentication&withLog=false
 @app.route("/Signing/SelectCertificate", methods=["GET"])
