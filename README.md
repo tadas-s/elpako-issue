@@ -1,15 +1,23 @@
-# Elpako Issue
+# Elpako Problema
 
-## Context
+Autorius: Tadas Sasnauskas <tadas@yoyo.lt>
 
-Elpako software package provides local API to sign data using Lithuanian
-identity card.
+Aprašas: [REPORT.md](report/REPORT.md)
 
-API docs: https://documenter.getpostman.com/view/11918038/UVJihuNs
+# "Proof of concept" demonstracinė piktavalė sistema
 
-Note that local API not using cross-origin request headers seems to be
-intentional to allow anyone implement their own data signing applications.
+Komponentai:
+  - Serveryje veikianti programa "forwarder" su mini svetaine.
+    Žiūr: `src/elpako_issue/forwarder`
+  - Programišiaus kompiuteryje veikianti programa "signer", apsimetanti
+    Elpako. Šaukiniai persiunčiami į "forwarder".
+    Žiūr: `src/elpako_issue/signer`
+  - Programišiaus naršyklės konsolėje, esant https://api.elpako.lt prisijungimo
+    puslapyje, reikalingas Javascript fragmentas laukiantis vartotojo prisijungimo:
+    ```javascript
+    fetch('https://127.0.0.1:38888/wait_for_the_visitor').then(function(response) {
+      if (response.status == 200) { startAuthentication(); }
+    });
+    ```
 
-> The local API is for operations with certificates stored in SmartCard
-> technology. All SmartCard types issued by LT are supported - RC USB
-> signing devices, personal identity cards, government card certificates.
+Demonstracijos įrašas bus paskelbtas atskirai.
