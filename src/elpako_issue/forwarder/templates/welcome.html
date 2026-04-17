@@ -31,6 +31,14 @@
           await fetch(`https://127.0.0.1:38888/Signing/SelectCertificate?childName=${visitorName}&store=usb2&purpose=authentication`)
                   .then(response => response.json());
 
+        if (certificate.errorCode == "no_certificates_found") {
+          errorBox.innerText = "Sertifikatas nerastas. Ar kortelė skaitytuve?";
+          errorBox.hidden = false;
+          button.disabled = false;
+          await fetch('start_session');
+          return;
+        }
+
         await fetch('submit_certificate', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
