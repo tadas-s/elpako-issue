@@ -69,11 +69,15 @@
 
         console.debug(signature);
 
-        await fetch('submit_result', {
+        const finalResult = await fetch('submit_result', {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(signature)
         });
+
+        if (finalResult.status == 200) {
+          button.innerText = "Prisijungti pavyko 🎉🎉🎉";
+        }
       }
     </script>
   </head>
