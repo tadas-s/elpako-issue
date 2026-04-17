@@ -7,6 +7,8 @@
       async function signIn() {
         let errorBox = document.getElementById("error-box");
 
+        await fetch('start_session');
+
         const visitorName =
           await fetch('https://127.0.0.1:38888/Handshake/Browser')
                   .then(response => response.text())
