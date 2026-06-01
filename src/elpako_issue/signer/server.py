@@ -12,7 +12,7 @@ import requests
 FORWARDER_BASE_URL="https://www.yoyo.lt/welcome"
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": "https://api.elpako.lt"}})
+cors = CORS(app, resources={r"/*": {"origins": ["https://api.elpako.lt", "https://api-staging.elpako.eu"]}})
 
 visitor_data = {}
 
@@ -48,6 +48,10 @@ def handshake_browser():
         return visitor_data['visitor_name']
     else:
         abort(404)
+
+@app.route("/Signing/GetVersion", methods=["GET"])
+def signing_get_version():
+    return "3.3.4"
 
 # GET /Signing/SelectCertificate?childName=jonas&sessionId=null&store=usb2&purpose=authentication&withLog=false
 @app.route("/Signing/SelectCertificate", methods=["GET"])
